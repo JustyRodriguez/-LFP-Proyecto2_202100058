@@ -5,6 +5,8 @@ from tkinter import filedialog as fd
 from tkinter import ttk
 import customtkinter
 from tkdocviewer import *
+import pymongo 
+from pymongo import *
 
 class objeto:
     #--------------Parametros de propiedades-------------------------------------------
@@ -435,51 +437,18 @@ def crear_colocacion(i,colocacion,reconocidos,trabajando_con,objetos_creados):
 
     return (nuevo_i, error)
 
-#ELIMINAR ESTA FUNCION
-#--------------Asignacion y estructuracion de documento HTML------------------------------------
-def crear_Pagina(objetos_creados):
-    html='''<html>
-    <head>
-    <link href="pagina.css" rel="stylesheet"
-    type="text/css" />
-    </head>
-    <body>'''
-    css = ""
-    for x in objetos_creados:
-        if x.identificador == "this":
-            html += x.crear_html()
-            html += '</body>\n</html>'
-        css+="#"+x.identificador+"{"
-        combined = "\t".join(x.css)
-        for i in x.css:
-            css+=i
-        if "width" not in combined and x.tipo != "AreaTexto":
-            css+="""width: 100px;
-            height: 25px;"""
-        elif "width" not in combined and x.tipo == "AreaTexto":
-            css+="""width: 150px;
-            height: 150px;"""
-        css+="}\n"
-
-    open("pagina.html", "w").close()
-    file = open("pagina.html", "w")
-    file.write(html)
-    file.close()
-    open("pagina.css", "w").close()
-    file = open("pagina.css", "w")
-    file.write(css)
-    file.close()
-
-    messagebox.showinfo(message="se ha creado la pagina con exito", title="Analizar")
-
-#ELIMINAR FUNCION
 #--------------Analizador sintactico------------------------------------
 def Analizador_sintactico(reconocidos):
     objetos_creados = [objeto("this", "")]
     i = 0
     errores = []
     while i < len(reconocidos):
-        if reconocidos[i][0] == "tk_control_a":
+        if reconocidos[i][0] == "tk_crear":
+            client=MongoClient("mongodb://localhost", 27017)
+            db=client["prueba"]
+            coleccion=db["personas"]
+            coleccion.insert_one({"name":"Justy", "password":123})
+            print(client.list_database_names()) 
             i+=1
             salir = False
             while not salir and i < len(reconocidos):
@@ -506,7 +475,7 @@ def Analizador_sintactico(reconocidos):
                 i+=1
             i-=1
             
-        elif reconocidos[i][0] == "tk_props_a":
+        elif reconocidos[i][0] == "tk_eliminar":
             i+=1
             salir = False
             while not salir  and i < len(reconocidos):
