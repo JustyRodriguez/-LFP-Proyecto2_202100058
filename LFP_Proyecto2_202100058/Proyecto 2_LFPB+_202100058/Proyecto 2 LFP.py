@@ -437,6 +437,44 @@ def crear_colocacion(i,colocacion,reconocidos,trabajando_con,objetos_creados):
 
     return (nuevo_i, error)
 
+#ELIMINAR ESTA FUNCION
+#--------------Asignacion y estructuracion de documento HTML------------------------------------
+def crear_Pagina(objetos_creados):
+    html='''<html>
+    <head>
+    <link href="pagina.css" rel="stylesheet"
+    type="text/css" />
+    </head>
+    <body>'''
+    css = ""
+    for x in objetos_creados:
+        if x.identificador == "this":
+            html += x.crear_html()
+            html += '</body>\n</html>'
+        css+="#"+x.identificador+"{"
+        combined = "\t".join(x.css)
+        for i in x.css:
+            css+=i
+        if "width" not in combined and x.tipo != "AreaTexto":
+            css+="""width: 100px;
+            height: 25px;"""
+        elif "width" not in combined and x.tipo == "AreaTexto":
+            css+="""width: 150px;
+            height: 150px;"""
+        css+="}\n"
+
+    open("pagina.html", "w").close()
+    file = open("pagina.html", "w")
+    file.write(html)
+    file.close()
+    open("pagina.css", "w").close()
+    file = open("pagina.css", "w")
+    file.write(css)
+    file.close()
+
+    messagebox.showinfo(message="se ha creado la pagina con exito", title="Analizar")
+
+#ELIMINAR FUNCION
 #--------------Analizador sintactico------------------------------------
 def Analizador_sintactico(reconocidos):
     objetos_creados = [objeto("this", "")]
@@ -445,10 +483,9 @@ def Analizador_sintactico(reconocidos):
     while i < len(reconocidos):
         if reconocidos[i][0] == "tk_crear":
             client=MongoClient("mongodb://localhost", 27017)
-            db=client["prueba"]
-            coleccion=db["personas"]
-            coleccion.insert_one({"name":"Justy", "password":123})
-            print(client.list_database_names()) 
+            db=client["None"]
+            coleccion=db["None"]
+            coleccion.insert_one({"name":"Null", "password":"Null"})
             i+=1
             salir = False
             while not salir and i < len(reconocidos):
@@ -474,8 +511,8 @@ def Analizador_sintactico(reconocidos):
                     errores.append(("Sintactico",cont[2], cont[3], cont[1], "Error sintactico, se esperaba un Control, pero se recibio: "+cont[0]))
                 i+=1
             i-=1
-            
-        elif reconocidos[i][0] == "tk_eliminar":
+
+        elif reconocidos[i][0] == "tk_props_a":
             i+=1
             salir = False
             while not salir  and i < len(reconocidos):
@@ -648,7 +685,6 @@ def Manual_user():
 
     ver_doc1 = DocViewer(Ver_Manu_user)
     ver_doc1.pack(side="top", expand=1, fill="both")
-    ver_doc1.display_file("Manual de usuario de proyecto 2 LFP A+.pdf")
 
 #-------Ventana emergente para mostrar el manual técnico------------------------------------------------
 def Manual_Tec():
@@ -665,7 +701,6 @@ def Manual_Tec():
 
     ver_doc2 = DocViewer(Ver_Manu_Tec)
     ver_doc2.pack(side="top", expand=1, fill="both")
-    ver_doc2.display_file("Manual Tecnico de proyecto 2 LFP A+.pdf")
 
 #$CAMBIAR DATOS
 #-----Funcion para mostrar los datos del creador------------------------------------------------
@@ -685,7 +720,7 @@ def Nuevo(area_texto):
     global archivo_abierto
     seleccion = messagebox.askquestion(message="¿Desea guardar los cambios?", title="Nuevo")
     if seleccion == "yes":
-        f = fd.asksaveasfile(mode='w', defaultextension=".gpw")
+        f = fd.asksaveasfile(filetype="/", title="Select a file", filetypes=(("Text files","*.txt"),("all files", "*.*"),("json files", "*.json")))
         if f is None:
             return
         guardar = str(area_texto.get(1.0, END)) 
@@ -718,7 +753,7 @@ def Abrir(area_texto):
                     
         area_texto.delete(1.0, END)
 
-    f = fd.askopenfilename(filetypes=[("GPW files",".gpw")])
+    f = fd.askopenfilename(filetypes=(("Text files","*.txt"),("all files", "*.*"),("json files", "*.json")))
     if f == "":
         return
     archivo_abierto = f
